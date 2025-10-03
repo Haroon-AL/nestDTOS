@@ -7,18 +7,20 @@ export const signupSchema = z
     email: z.email(),
     password: z
       .string()
-      .min(8, { message: 'Must be a minimum of 8 characters.' }),
-
-    cnfpassword: z
-      .string()
-      .min(8, { message: 'Must be a minimum of 8 characters.' }),
-
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
+        'Password must be ≥8 characters, include uppercase, lowercase, number, and special char',
+      ),
+    cnfpassword: z.string(),
     DOJ: z.date(),
   })
   .refine((d) => d.password == d.cnfpassword, {
     error: 'passwords dont match',
   })
-  .refine((d) => {
-    let currDate = new Date();
-    return d.DOJ < currDate;
-  },{error: "date must be less than today"});
+  .refine(
+    (d) => {
+      let currDate = new Date();
+      return d.DOJ < currDate;
+    },
+    { error: 'date must be less than today' },
+  );
